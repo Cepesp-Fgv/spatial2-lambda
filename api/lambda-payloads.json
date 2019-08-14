@@ -1,0 +1,14 @@
+{
+    "legendas": {
+        "apigateway": {
+            "path": "/api/legendas",
+            "method": {
+                "value": "GET",
+                "items": [
+                    "GET"
+                ]
+            },
+            "queryString": "year=2014&position=1&uf=CE&turn=1"
+        }
+    }
+}

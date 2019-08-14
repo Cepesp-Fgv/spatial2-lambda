@@ -1,0 +1,29 @@
+{
+  "name": "spatial2",
+  "version": "1.0.0",
+  "description": "a serverless spatial2 api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cepesp-Fgv/spatial2-lambda.git"
+  },
+  "keywords": [
+    "spatial2",
+    "lambda",
+    "aws"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cepesp-Fgv/spatial2-lambda/issues"
+  },
+  "homepage": "https://github.com/Cepesp-Fgv/spatial2-lambda#readme",
+  "dependencies": {
+    "knex": "^0.19.1",
+    "mysql2": "^1.6.5",
+    "pg": "^7.12.1"
+  }
+}
