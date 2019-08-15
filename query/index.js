@@ -11,18 +11,16 @@ const db = require("knex")({
 });
 
 exports.handler = function(event, context, callback) {
+    context.callbackWaitsForEmptyEventLoop = false; 
     const params = event.queryStringParameters;
-    var promise;
+    let promise;
     
     if (params.table === 'legendas') {
-        const { uf, codigo_cargo, ano_eleicao, num_turno } = params;
-        promise = getCoalitions(uf, codigo_cargo, ano_eleicao, num_turno);
+        promise = getCoalitions(params);
     } else if (params.table === 'candidatos') {
-        const { uf, codigo_cargo, ano_eleicao, num_turno, id_legenda } = params;
-        promise = getCandidates(uf, codigo_cargo, ano_eleicao, num_turno, id_legenda);
+        promise = getCandidates(params);
     } else if (params.table === 'votos_mun') {
-        const { uf, ano_eleicao, num_turno, id_candidato } = params;
-        promise = getMunVotes(uf, ano_eleicao, num_turno, id_candidato);
+        promise = getMunVotes(params);
     }
     
     if (promise)
@@ -31,27 +29,34 @@ exports.handler = function(event, context, callback) {
         callback("Invalid Table");
 };
 
-function getCoalitions(uf, position, year, turn) {
+function getCoalitions(params) {
+    const { uf, position, year, turn } = params;
+    
+    return db('candidatos')
+        .select(['sigla_partido', 'numero_partido'])
+        .where('sigla_uf', uf)
+        .where('codigo_cargo', position)
+        .where('ano_eleicao', year)
+        .where('num_turno', turn)
+        .groupBy(['sigla_partido', 'numero_partido']);
+}
+
+function getCandidates(params) {
+    const { uf, position, year, turn, party } = params;
+    
     return db('candidatos')
         .where('sigla_uf', uf)
         .where('codigo_cargo', position)
         .where('ano_eleicao', year)
         .where('num_turno', turn)
-        .group_by('sigla_partido');
+        .where('numero_partido', party);
 }
 
-function getCandidates(uf, position, year, turn, coalition_id) {
-    return db('candidatos')
-        .where('sigla_uf', uf)
-        .where('codigo_cargo', position)
-        .where('ano_eleicao', year)
-        .where('num_turno', turn)
-        .where('id_legenda', coalition_id);
-}
-
-function getMunVotes(uf, year, turn, candidate_id) {
+function getMunVotes(params) {
+    const { uf, year, turn, candidate_id} = params;
+    
     return db('votos_mun')
-        .where('sigla_uf', uf)
+        .where('uf', uf)
         .where('ano_eleicao', year)
         .where('num_turno', turn)
         .where('id_candidato', candidate_id);

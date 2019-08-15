@@ -1,14 +1,14 @@
 {
-    "legendas": {
+    "query": {
         "apigateway": {
-            "path": "/api/legendas",
+            "path": "/api/query",
             "method": {
                 "value": "GET",
                 "items": [
                     "GET"
                 ]
             },
-            "queryString": "year=2014&position=1&uf=CE&turn=1"
+            "queryString": "table=votos_mun&year=2014&uf=BR&turn=1&candidate_id=8003451"
         }
     }
 }
