@@ -10,23 +10,26 @@ const db = require("knex")({
     }
 });
 
-exports.handler = function(event, context, callback) {
+const handlers = {
+    legendas: getCoalitions,
+    candidatos: getCandidates,
+    votos_mun: getMunVotes,
+};
+
+exports.handler = async function(event, context) {
     context.callbackWaitsForEmptyEventLoop = false; 
-    const params = event.queryStringParameters;
-    let promise;
+    const { table, ...params } = event.queryStringParameters || {};
     
-    if (params.table === 'legendas') {
-        promise = getCoalitions(params);
-    } else if (params.table === 'candidatos') {
-        promise = getCandidates(params);
-    } else if (params.table === 'votos_mun') {
-        promise = getMunVotes(params);
+    try {
+        let action = handlers[table];
+        if (action)
+            return createResponse(await action(params));
+        else
+            throw Error("Invalid Table");
+    } catch (e) {
+        return createResponse("Could not run query: " + e, 402);
     }
-    
-    if (promise)
-        promise.then(result => callback(null, createResponse(result)));
-    else
-        callback("Invalid Table");
+       
 };
 
 function getCoalitions(params) {
@@ -43,6 +46,8 @@ function getCoalitions(params) {
 
 function getCandidates(params) {
     const { uf, position, year, turn, party } = params;
+    
+    if (position == 1) uf = "BR";
     
     return db('candidatos')
         .where('sigla_uf', uf)

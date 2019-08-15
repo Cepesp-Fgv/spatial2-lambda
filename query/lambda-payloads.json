@@ -8,7 +8,7 @@
                     "GET"
                 ]
             },
-            "queryString": "table=votos_mun&year=2014&uf=BR&turn=1&candidate_id=8003451"
+            "queryString": "table=candidatos&uf=BR&turn=2&position=1&year=2014&party=13"
         }
     }
 }
