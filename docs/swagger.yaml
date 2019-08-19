@@ -1,0 +1,240 @@
+openapi: 3.0.0
+servers:
+  - description: Serverless Application
+    url: 'https://api.spatial2.cepesp.io'
+info:
+  description: 'Esta é uma API para consultar os dados de legendas, candidatos e votos do TSE. Esta implementação foi feita específicamente para o aplicativo Spatial2.'
+  version: "1.0.0"
+  title: Spatial2
+  contact:
+    email: contato@urbbox.com.br
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  '/api/query?table=legendas':
+    get:
+      summary: Consultar partidos
+      description: |
+        Consultar partidos por ano, turno, uf e cargo
+      parameters:
+        - in: query
+          name: year
+          description: Ano da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1998
+            maximum: 2018
+        - in: query
+          name: position
+          description: Cargo da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 13
+        - in: query
+          name: turn
+          description: Turno da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 2
+        - in: query
+          name: uf
+          description: UF a ser filtrado
+          schema:
+            type: string
+        
+      responses:
+        '200':
+          description: 'Quando os parâmetros estão corretos'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Partido'
+        '402':
+          description: quando há parâmetros inválidos
+  '/api/query?table=candidatos':
+    get:
+      summary: Consultar candidatos do partido
+      description: |
+        Consultar candidatos por ano, turno, uf e cargo
+      parameters:
+        - in: query
+          name: uf
+          description: UF a ser filtrado
+          schema:
+            type: string
+        - in: query
+          name: turn
+          description: Turno da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 2
+        - in: query
+          name: year
+          description: Ano da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1998
+            maximum: 2018
+        - in: query
+          name: position
+          description: Cargo do candidato
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 13
+        - in: query
+          name: party
+          description: Número do partido
+          schema:
+            type: integer
+            format: int32
+            minimum: 00
+            maximum: 99
+      responses:
+        '200':
+          description: 'Quando os parâmetros estão corretos'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidato'
+        '402':
+          description: quando há parâmetros inválidos
+  '/api/query?table=votos_mun':
+    get:
+      summary: Consultar candidatos
+      description: |
+        Consultar candidatos por ano, turno, uf e cargo
+      parameters:
+        - in: query
+          name: year
+          description: Ano da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1998
+            maximum: 2018
+        - in: query
+          name: turn
+          description: Turno da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 2
+        - in: query
+          name: uf
+          description: UF a ser filtrado
+          schema:
+            type: string
+        - in: query
+          name: candidate_id
+          description: ID do candidato
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: 'Quando os parâmetros estão corretos'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VotosPorMunicipio'
+        '402':
+          description: quando há parâmetros inválidos
+components:
+  schemas:
+    Partido:
+      type: object
+      required:
+        - nome_partido
+        - numero_partido
+      properties:
+        nome_partido:
+          type: string
+          example: 'PTD'
+        numero_partido:
+          type: integer
+          example: 22
+    Candidato:
+      type: object
+      required:
+        - id_candidato
+        - nome_candidato
+        - numero_candidato
+      properties:
+        id_candidato:
+          type: integer
+          example: 1234567
+        nome_candidato:
+          type: string
+          example: JOSE DA SILVA EXEMPLO
+        numero_candidato:
+          type: integer
+          example: 12
+    VotosPorMunicipio:
+      type: object
+      required:
+        - id_candidato
+        - id_legenda
+        - cod_mun_tse
+        - cod_mun_ibge
+        - qtde_votos
+      properties:
+        id_candidato:
+          type: integer
+          example: 1234567
+        id_legenda:
+          type: integer
+          example: 2345678
+        codigo_macro:
+          type: integer
+          example: 2
+        nome_macro:
+          type: string
+          example: Nordeste
+        uf:
+          type: string
+          example: CE
+        nome_uf:
+          type: string
+          example: Ceará
+        codigo_meso:
+          type: integer
+          example: 16
+        nome_meso:
+          type: string
+          example: Metropolitana de Fortaleza
+        codigo_micro:
+          type: integer
+          example: 16
+        nome_micro:
+          type: string
+          example: Fortaleza
+        nome_municipio:
+          type: string
+          example: Fortaleza
+        cod_mun_tse:
+          type: integer
+          example: 13030
+        cod_mun_ibge:
+          type: integer
+          example: 2304400
+        qtde_votos:
+          type: integer
+          example: 234
