@@ -33,7 +33,9 @@ exports.handler = async function(event, context) {
 };
 
 function getCoalitions(params) {
-    const { uf, position, year, turn } = params;
+    let { uf, position, year, turn } = params;
+    
+    if (position == 1) uf = "BR";
     
     return db('candidatos')
         .select(['sigla_partido', 'numero_partido'])
@@ -45,11 +47,12 @@ function getCoalitions(params) {
 }
 
 function getCandidates(params) {
-    const { uf, position, year, turn, party } = params;
+    let { uf, position, year, turn, party } = params;
     
     if (position == 1) uf = "BR";
     
     return db('candidatos')
+        .select(['id_candidato', 'nome_candidato', 'numero_candidato'])
         .where('sigla_uf', uf)
         .where('codigo_cargo', position)
         .where('ano_eleicao', year)
@@ -58,9 +61,26 @@ function getCandidates(params) {
 }
 
 function getMunVotes(params) {
-    const { uf, year, turn, candidate_id} = params;
+    let { uf, year, turn, candidate_id } = params;
     
     return db('votos_mun')
+        .select([
+            'id_candidato',
+            'id_legenda',
+            'numero_candidato',
+            'codigo_macro',
+            'nome_macro',
+            'uf',
+            'nome_uf',
+            'codigo_meso',
+            'nome_meso',
+            'codigo_micro',
+            'nome_micro',
+            'nome_municipio',
+            'cod_mun_tse',
+            'cod_mun_ibge',
+            'qtde_votos'
+        ])
         .where('uf', uf)
         .where('ano_eleicao', year)
         .where('num_turno', turn)

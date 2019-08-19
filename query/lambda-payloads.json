@@ -7,8 +7,18 @@
                 "items": [
                     "GET"
                 ]
-            },
-            "queryString": "table=candidatos&uf=BR&turn=2&position=1&year=2014&party=13"
+            }
+        }
+    },
+    "QueryFn": {
+        "apigateway": {
+            "path": "/api/query",
+            "method": {
+                "value": "GET",
+                "items": [
+                    "GET"
+                ]
+            }
         }
     }
 }
