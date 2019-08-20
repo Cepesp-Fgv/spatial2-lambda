@@ -11,7 +11,7 @@ const db = require("knex")({
 });
 
 const handlers = {
-    legendas: getCoalitions,
+    legendas: getParties,
     candidatos: getCandidates,
     votos_mun: getMunVotes,
 };
@@ -32,14 +32,14 @@ exports.handler = async function(event, context) {
        
 };
 
-function getCoalitions(params) {
+function getParties(params) {
     let { uf, position, year, turn } = params;
     
     if (position == 1) uf = "BR";
     
     return db('candidatos')
         .select(['sigla_partido', 'numero_partido'])
-        .where('sigla_uf', uf)
+        .where('sigla_uf', uf.toUpperCase())
         .where('codigo_cargo', position)
         .where('ano_eleicao', year)
         .where('num_turno', turn)
@@ -53,7 +53,7 @@ function getCandidates(params) {
     
     return db('candidatos')
         .select(['id_candidato', 'nome_candidato', 'numero_candidato'])
-        .where('sigla_uf', uf)
+        .where('sigla_uf', uf.toUpperCase())
         .where('codigo_cargo', position)
         .where('ano_eleicao', year)
         .where('num_turno', turn)
@@ -81,7 +81,7 @@ function getMunVotes(params) {
             'cod_mun_ibge',
             'qtde_votos'
         ])
-        .where('uf', uf)
+        .where('uf', uf.toUpperCase())
         .where('ano_eleicao', year)
         .where('num_turno', turn)
         .where('id_candidato', candidate_id);
@@ -90,6 +90,11 @@ function getMunVotes(params) {
 function createResponse(result, statusCode) {
     return {
         statusCode,
-        body: JSON.stringify(result)
+        body: JSON.stringify(result),
+        headers: {
+          "Access-Control-Allow-Credentials": true,
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        }
     };
 }
