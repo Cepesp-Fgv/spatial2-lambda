@@ -62,7 +62,7 @@ function getCandidates(params) {
 }
 
 function getMunVotes(params) {
-    let { uf, year, turn, candidate_id,  } = params;
+    let { uf, year, turn, candidate_id } = params;
     
     return db('votos_mun')
         .select([
@@ -90,7 +90,7 @@ function getMunVotes(params) {
 
 function getQl( params ){
     let { uf, year, turn, candidate_id, position } = params;
-    db.raw(`
+    return  db.raw(`
     select numero_candidato, 
     cod_mun_tse, 
     total_votos_estado, 
@@ -102,14 +102,14 @@ function getQl( params ){
         m.cod_mun_tse, m.qtde_votos, 
         s.qtde_votos as qtde_votos_mun,
         (select sum(qtde_votos) 
-            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and codigo_cargo = '${position}' and id_candidato = ${candidate_id}) as total_votos_cand,
+            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}' and id_candidato = ${candidate_id}) as total_votos_cand,
         (select sum(qtde_votos) 
-            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and codigo_cargo = '${position}') as total_votos_estado
+            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}') as total_votos_estado
     from votos_mun as m
     join(select cod_mun_tse, 
         sum(qtde_votos) as qtde_votos 
-        from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and codigo_cargo = '${position}' group by cod_mun_tse) as s on m.cod_mun_tse = s.cod_mun_tse
-    where id_candidato = ${candidate_id}) as t`)
+        from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}' group by cod_mun_tse) as s on m.cod_mun_tse = s.cod_mun_tse
+    where id_candidato = ${candidate_id}) as t`);
 }
 
 function createResponse(result, statusCode) {
