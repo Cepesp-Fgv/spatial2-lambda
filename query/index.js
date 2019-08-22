@@ -88,28 +88,30 @@ function getMunVotes(params) {
         .where('id_candidato', candidate_id);
 }
 
-function getQl( params ){
+function getQl(params) {
     let { uf, year, turn, candidate_id, position } = params;
+    
     return  db.raw(`
-    select numero_candidato, 
-    cod_mun_tse, 
-    total_votos_estado, 
-    total_votos_cand, 
-    qtde_votos_mun, 
-    (qtde_votos * total_votos_estado) / (total_votos_cand * qtde_votos_mun) as QL 
-    from(
         select numero_candidato, 
-        m.cod_mun_tse, m.qtde_votos, 
-        s.qtde_votos as qtde_votos_mun,
-        (select sum(qtde_votos) 
-            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}' and id_candidato = ${candidate_id}) as total_votos_cand,
-        (select sum(qtde_votos) 
-            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}') as total_votos_estado
-    from votos_mun as m
-    join(select cod_mun_tse, 
-        sum(qtde_votos) as qtde_votos 
-        from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}' group by cod_mun_tse) as s on m.cod_mun_tse = s.cod_mun_tse
-    where id_candidato = ${candidate_id}) as t`);
+        cod_mun_tse, 
+        total_votos_estado, 
+        total_votos_cand, 
+        qtde_votos_mun, 
+        (qtde_votos * total_votos_estado) / (total_votos_cand * qtde_votos_mun) as QL 
+        from(
+            select numero_candidato, 
+            m.cod_mun_tse, m.qtde_votos, 
+            s.qtde_votos as qtde_votos_mun,
+            (select sum(qtde_votos) 
+                from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}' and id_candidato = ${candidate_id}) as total_votos_cand,
+            (select sum(qtde_votos) 
+                from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}') as total_votos_estado
+        from votos_mun as m
+        join(select cod_mun_tse, 
+            sum(qtde_votos) as qtde_votos 
+            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and turn = ${turn} and codigo_cargo = '${position}' group by cod_mun_tse) as s on m.cod_mun_tse = s.cod_mun_tse
+        where id_candidato = ${candidate_id}) as t
+    `);
 }
 
 function createResponse(result, statusCode) {
