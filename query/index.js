@@ -91,29 +91,51 @@ function getMunVotes(params) {
 
 function getQl(params) {
     let { uf, year, turn, candidate_id, position } = params;
-    const response = db.raw(`
-        select numero_candidato, 
-        cod_mun_tse, 
-        total_votos_estado, 
-        total_votos_cand, 
-        qtde_votos_mun, 
-        (qtde_votos * total_votos_estado) / (total_votos_cand * qtde_votos_mun) as QL 
-        from(
-            select numero_candidato, 
-            m.cod_mun_tse, m.qtde_votos, 
-            s.qtde_votos as qtde_votos_mun,
-            (select sum(qtde_votos) 
-                from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and num_turno = ${turn} and codigo_cargo = ${position} and id_candidato = ${candidate_id}) as total_votos_cand,
-            (select sum(qtde_votos) 
-                from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and num_turno = ${turn} and codigo_cargo = ${position}) as total_votos_estado
-        from votos_mun as m
-        join(select cod_mun_tse, 
-            sum(qtde_votos) as qtde_votos 
-            from votos_mun where ano_eleicao = '${year}' and uf = '${uf.toUpperCase()}' and num_turno = ${turn} and codigo_cargo = ${position} group by cod_mun_tse) as s on m.cod_mun_tse = s.cod_mun_tse
-        where id_candidato = ${candidate_id}) as t
-    `);
 
-    return response.rows;
+    const total_votos_cand = db
+        .select([db.raw('sum(qtde_votos)')])
+        .from('votos_mun')
+        .where('ano_eleicao', year)
+        .where('uf', uf.toUpperCase())
+        .where('num_turno', turn)
+        .where('codigo_cargo', position)
+        .where('id_candidato', candidate_id);
+
+    const total_votos_estado = db
+        .select([db.raw('sum(qtde_votos)')])
+        .from('votos_mun')
+        .where('ano_eleicao', year)
+        .where('uf', uf.toUpperCase())
+        .where('num_turno', turn)
+        .where('codigo_cargo', position);
+
+    const s = db
+        .select(['cod_mun_tse', db.raw('sum(qtde_votos) as qtde_votos')])
+        .from('votos_mun')
+        .where('ano_eleicao', year)
+        .where('uf', uf.toUpperCase())
+        .where('num_turno', turn)
+        .where('codigo_cargo', position)
+        .groupBy('cod_mun_tse');
+
+
+    const inner = db
+        .select(['numero_candidato', 'm.cod_mun_tse', 'm.qtde_votos',
+            db.raw('s.qtde_votos as qtde_votos_mun'),
+            total_votos_cand.as('total_votos_cand'),
+            total_votos_estado.as('total_votos_estado')
+        ])
+        .from('votos_mun as m')
+        .join(s.as('s'), 'm.cod_mun_tse', '=', 's.cod_mun_tse')
+        .where('id_candidato', candidate_id);
+
+
+    return db
+        .select(['numero_candidato', 'cod_mun_tse', 'total_votos_estado',
+            'total_votos_cand', 'qtde_votos_mun',
+            db.raw('(qtde_votos * total_votos_estado) / (total_votos_cand * qtde_votos_mun) as QL')
+        ])
+        .from(inner.as('t'));
 }
 
 function createResponse(result, statusCode) {
