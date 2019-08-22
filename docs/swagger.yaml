@@ -117,7 +117,51 @@ paths:
     get:
       summary: Consultar candidatos
       description: |
-        Consultar candidatos por ano, turno, uf e cargo
+        Consultar candidatos por ano, turno, uf, cargo e candidato
+      parameters:
+        - in: query
+          name: year
+          description: Ano da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1998
+            maximum: 2018
+        - in: query
+          name: turn
+          description: Turno da eleição
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 2
+        - in: query
+          name: uf
+          description: UF a ser filtrado
+          schema:
+            type: string
+        - in: query
+          name: candidate_id
+          description: ID do candidato
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: 'Quando os parâmetros estão corretos'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VotosPorMunicipio'
+        '402':
+          description: quando há parâmetros inválidos
+  '/api/query?table=ql':
+    get:
+      summary: Consultar Quociente Eleitoral
+      description: |
+        Consultar candidatos por ano, turno, uf, cargo e candidato
       parameters:
         - in: query
           name: year
