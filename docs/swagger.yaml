@@ -198,7 +198,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/VotosPorMunicipio'
+                  $ref: '#/components/schemas/CandidatoMunicipioQL'
         '402':
           description: quando há parâmetros inválidos
 components:
@@ -282,3 +282,31 @@ components:
         qtde_votos:
           type: integer
           example: 234
+    CandidatoMunicipioQL:
+      type: object
+      required:
+        - numero_candidato
+        - cod_mun_tse
+        - total_votos_estado
+        - total_votos_cand
+        - qtde_votos_mun
+        - ql
+      properties:
+        numero_candidato:
+          type: integer
+          example: 99
+        cod_mun_tse:
+          type: integer
+          example: 13005
+        total_votos_estado:
+          type: integer
+          example: 4907255
+        total_votos_cand:
+          type: integer
+          example: 3522884
+        qtde_votos_mun:
+          type: integer
+          example: 9594
+        ql:
+          type: integer
+          example: 0.94461454363963979077
