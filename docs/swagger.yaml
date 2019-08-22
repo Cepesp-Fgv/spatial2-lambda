@@ -159,9 +159,9 @@ paths:
           description: quando há parâmetros inválidos
   '/api/query?table=ql':
     get:
-      summary: Consultar Quociente Eleitoral
+      summary: Consultar Coeficiente Locacional
       description: |
-        Consultar candidatos por ano, turno, uf, cargo e candidato
+        Consultar coeficientes por ano, turno, uf, cargo e candidato
       parameters:
         - in: query
           name: year
