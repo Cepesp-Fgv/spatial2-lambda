@@ -172,6 +172,14 @@ paths:
             minimum: 1998
             maximum: 2018
         - in: query
+          name: position
+          description: Cargo do candidato
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 13
+        - in: query
           name: turn
           description: Turno da eleição
           schema:
