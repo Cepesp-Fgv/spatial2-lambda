@@ -18,7 +18,8 @@
                 "items": [
                     "GET"
                 ]
-            }
+            },
+            "queryString": "table=ql&year=2014&uf=CE&position=1&turn=2&candidate_id=8003458"
         }
     }
 }
