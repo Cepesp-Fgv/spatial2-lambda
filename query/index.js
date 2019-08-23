@@ -132,7 +132,7 @@ function getQl(params) {
 
     return db
         .select(['numero_candidato', 'cod_mun_tse', 'total_votos_estado',
-            'total_votos_cand', 'qtde_votos_mun',
+            'total_votos_cand', 'qtde_votos_mun', 'qtde_votos',
             db.raw('(qtde_votos * total_votos_estado) / (total_votos_cand * qtde_votos_mun) as QL')
         ])
         .from(inner.as('t'));
